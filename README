@@ -1,16 +1,24 @@
 DB-Color
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
+Syntax highlighting for the Perl debugger.
 
-A README file is required for CPAN modules since CPAN extracts the README
-file from a module distribution so that people browsing the archive
-can use it to get an idea of the module's uses. It is usually a good idea
-to provide version information here so that people can decide whether
-fixes for the module are worth downloading.
+Want this?
+http://blogs.perl.org/users/ovid/2010/11/syntax-highlighting-for-the-perl-debugger.html
 
+Then add this to your $HOME/.perldb
+
+ sub afterinit {
+     push @DB::typeahead, "{{v"
+       unless $DB::already_curly_curly_v++;
+ }
+ use DB::Color;
+
+Then use your debugger like normal:
+
+ perl -d some_file.pl
+
+This code is a proof of concept and is buggy. The syntax highlighting is
+buggy. Fix it :)
 
 INSTALLATION
 
