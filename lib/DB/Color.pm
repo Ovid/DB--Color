@@ -11,11 +11,11 @@ DB::Color - Colorize your debugger output
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -55,10 +55,13 @@ sub import {
         # syntax highlight everything and cache it
         my $lines = $COLORED{$package}{$filename} ||= do {
             no strict 'refs';
-            my $lines = join "" => @{"::_<$filename"};
+
+            # quick hack
+            no warnings 'uninitialized';
+            my $code = join "" => @{"::_<$filename"};
             [
                 map { "$_\n" }
-                  split /\n/ => $HIGHLIGHTER->highlightText($lines)
+                  split /\n/ => $HIGHLIGHTER->highlightText($code)
             ];
         };
 

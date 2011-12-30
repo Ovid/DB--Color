@@ -1,5 +1,10 @@
 Revision history for DB-Color
 
-0.01    Date/time
-        First version, released on an unsuspecting world.
+0.02    30/12/2011
+        - Quick hack to silence uninit warnings in DB::DB
+        - Silence warnings from Kate highlighter
+        - Tried to make the colors easier to work with
+
+0.01    30/12/2011
+        - Debugger syntax highlighting
 
