@@ -14,7 +14,7 @@ WriteMakefile(
     PL_FILES  => {},
     PREREQ_PM => {
         'Test::More'                      => 0,
-        'Syntax::Highlight::Engine::Kate' => 0.6,
+        'Syntax::Highlight::Engine::Kate' => 0.06,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES    => 'DB-Color-*' },
