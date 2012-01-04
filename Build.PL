@@ -13,7 +13,7 @@ my $builder = Module::Build->new(
     create_makefile_pl   => 'traditional',
     recursive_test_files => 1,
     meta_merge =>
-      { resources => { repository => 'https://github.com/Ovid/DB-Color' } },
+      { resources => { repository => 'https://github.com/Ovid/DB--Color' } },
 );
 
 $builder->create_build_script();
