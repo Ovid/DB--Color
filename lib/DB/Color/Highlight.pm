@@ -6,6 +6,18 @@ use Term::ANSIColor ':constants';
 
 use Syntax::Highlight::Engine::Kate::Perl;
 
+=head1 NAME
+
+DB::Color::Highlight - Provides highlighting for DB::Color
+
+=head1 VERSION
+
+Version 0.03
+
+=cut
+
+our $VERSION = '0.03';
+
 BEGIN {
     no warnings 'redefine';
     *Syntax::Highlight::Engine::Kate::Template::logwarning = sub { };
@@ -34,3 +46,26 @@ sub highlighter {
 }
 
 1;
+__END__
+
+=head1 SYNOPSIS
+
+ use DB::Color::Highlight;
+ my $highlighter = DB::Color::Highlight::highlighter();
+ my $highlighted = $highlighter->highlightText($code);
+
+=head1 INTERNAL USE ONLY
+
+Don't touch this. It's subject to change at any time.
+
+=head1 EXPORT
+
+Nothing.
+
+=head1 SUBROUTINES
+
+=head2 C<highlighter>
+
+Returns a L<Syntax::Highlight::Engine::Kate::Perl> object.
+
+=cut

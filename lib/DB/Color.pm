@@ -1,6 +1,6 @@
 package DB::Color;
 
-use 5.006;
+use 5.008;
 use strict;
 use warnings;
 use DB::Color::Highlight;
@@ -11,11 +11,11 @@ DB::Color - Colorize your debugger output
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 

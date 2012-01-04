@@ -1,10 +1,15 @@
 Revision history for DB-Color
 
-0.02    30/12/2011
+0.03    2012/01/04
+        - Add Build.PL. List github repo.
+        - Syntax highlighter requires 5.8.0, so put that in the Makefile.PL
+        - POD for DB::Color::Highlighter.
+
+0.02    2011/12/30
         - Quick hack to silence uninit warnings in DB::DB
         - Silence warnings from Kate highlighter
         - Tried to make the colors easier to work with
 
-0.01    30/12/2011
+0.01    2011/12/30
         - Debugger syntax highlighting
 
