@@ -12,11 +12,11 @@ DB::Color::Highlight - Provides highlighting for DB::Color
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 BEGIN {
     no warnings 'redefine';

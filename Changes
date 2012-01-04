@@ -1,5 +1,8 @@
 Revision history for DB-Color
 
+0.05    2012/01/04
+        - Ouch! Add the actual highlighter to the MANIFEST
+
 0.04    2012/01/04
         - Fix Github link in Build.PL
 
