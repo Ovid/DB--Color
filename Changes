@@ -1,5 +1,8 @@
 Revision history for DB-Color
 
+0.04    2012/01/04
+        - Fix Github link in Build.PL
+
 0.03    2012/01/04
         - Add Build.PL. List github repo.
         - Syntax highlighter requires 5.8.0, so put that in the Makefile.PL
