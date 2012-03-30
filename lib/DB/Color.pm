@@ -11,11 +11,11 @@ DB::Color - Colorize your debugger output
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
 
@@ -31,6 +31,11 @@ Then use your debugger like normal:
 
  perl -d some_file.pl
 
+=head1 DISABLING COLOR
+
+If the NO_DB_COLOR environment variable is set to a true value, syntax
+highlighting will be disabled.
+
 =head1 ALPHA
 
 This is only a proof of concept. In fact, it's fair to say that this code
@@ -43,6 +48,7 @@ my $HIGHLIGHTER = DB::Color::Highlight::highlighter();
 my %COLORED;
 
 sub import {
+    return if $ENV{NO_DB_COLOR};
     my $old_db = \&DB::DB;
 
     my $new_DB = sub {
