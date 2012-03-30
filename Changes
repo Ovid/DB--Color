@@ -3,6 +3,7 @@ Revision history for DB-Color
 0.06
         - Don't highlight if NO_DB_COLOR environment variable is set to a true value.
         - Add optional debugging to log file
+        - Naive caching of output files
 
 0.05    2012/01/04
         - Ouch! Add the actual highlighter to the MANIFEST

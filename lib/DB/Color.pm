@@ -6,7 +6,6 @@ use warnings;
 use DB::Color::Highlight;
 use IO::Handle;
 use File::Spec::Functions qw(catfile catdir);
-use Digest::MD5 'md5_base64';
 
 =head1 NAME
 
@@ -39,6 +38,17 @@ Then use your debugger like normal:
 If the NO_DB_COLOR environment variable is set to a true value, syntax
 highlighting will be disabled.
 
+=head1 PERFORMANCE
+
+Syntax highlighting the code is very, very slow. As a result, we cache the
+output files in F<$HOME/.perldbcolor>. This is done by calculating the md5 sum
+of the file contents. If the file is changed, we get a new sum. This means
+that syntax highlighting is very slow at first, but every time you hit the
+same file, assuming its unchnanged, the cached version is served first.
+
+Note that the cache files are never removed. This has merely been a naive hack
+for a proof of concept. Patches welcome.
+
 =head1 ALPHA
 
 This is only a proof of concept. In fact, it's fair to say that this code
@@ -47,10 +57,10 @@ a memory hog, as if the debugger wasn't bad enough already.
 
 =cut
 
-my $HIGHLIGHTER = DB::Color::Highlight->new;
 my %COLORED;
 my $DB_BASE_DIR = catdir( $ENV{HOME}, '.perldbcolor' );
 my $DB_LOG = catfile( $DB_BASE_DIR, 'debug.log' );
+my $HIGHLIGHTER = DB::Color::Highlight->new( { cache_dir => $DB_BASE_DIR } );
 
 sub import {
     return if $ENV{NO_DB_COLOR};
