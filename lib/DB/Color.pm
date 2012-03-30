@@ -4,6 +4,9 @@ use 5.008;
 use strict;
 use warnings;
 use DB::Color::Highlight;
+use IO::Handle;
+use File::Spec::Functions qw(catfile catdir);
+use Digest::MD5 'md5_base64';
 
 =head1 NAME
 
@@ -44,12 +47,21 @@ a memory hog, as if the debugger wasn't bad enough already.
 
 =cut
 
-my $HIGHLIGHTER = DB::Color::Highlight::highlighter();
+my $HIGHLIGHTER = DB::Color::Highlight->new;
 my %COLORED;
+my $DB_BASE_DIR = catdir( $ENV{HOME}, '.perldbcolor' );
+my $DB_LOG = catfile( $DB_BASE_DIR, 'debug.log' );
 
 sub import {
     return if $ENV{NO_DB_COLOR};
     my $old_db = \&DB::DB;
+
+    my $debug;
+    if ( $ENV{DB_COLOR_DEBUG} || 1 ) {
+        open $debug, '>>', $DB_LOG
+            or die "Cannot open $DB_LOG for appending: $!";
+        $debug->autoflush(1);
+    }
 
     my $new_DB = sub {
         my $lvl = 0;
@@ -57,6 +69,9 @@ sub import {
             return if $pkg eq "DB" or $pkg =~ /^DB::/;
         }
         my ( $package, $filename ) = caller;
+        if ($debug) {
+            print $debug "In package '$package', filename '$filename'\n";
+        }
 
         # syntax highlight everything and cache it
         my $lines = $COLORED{$package}{$filename} ||= do {
@@ -67,7 +82,7 @@ sub import {
             my $code = join "" => @{"::_<$filename"};
             [
                 map { "$_\n" }
-                  split /\n/ => $HIGHLIGHTER->highlightText($code)
+                  split /\n/ => $HIGHLIGHTER->highlight_text($code)
             ];
         };
 

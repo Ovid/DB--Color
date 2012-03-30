@@ -23,10 +23,17 @@ BEGIN {
     *Syntax::Highlight::Engine::Kate::Template::logwarning = sub { };
 }
 
-sub highlighter {
+sub new {
+    my $class = shift;
+    my $self = bless {} => $class;
+    $self->_initialize;
+    return $self;
+}
 
-    # Yeah, this sucks. Hard. Fix it!
-    return Syntax::Highlight::Engine::Kate::Perl->new(
+sub _initialize {
+    my $self = shift;
+
+    my $highlighter = Syntax::Highlight::Engine::Kate::Perl->new(
         format_table => {
             'Keyword'      => [ GREEN,   RESET ],
             'Comment'      => [ BLUE,    RESET ],
@@ -43,6 +50,14 @@ sub highlighter {
             'DataType'     => [ YELLOW,  RESET ],    # variable names
         }
     );
+    $self->{highlighter} = $highlighter;
+}
+
+sub _highlighter { $_[0]->{highlighter} }
+
+sub highlight_text {
+    my ( $self, $code ) = @_;
+    return $self->_highlighter->highlightText($code);
 }
 
 1;
