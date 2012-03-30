@@ -5,6 +5,8 @@ Revision history for DB-Color
         - Add optional debugging to log file
         - Naive caching of output files
         - Workaround Syntax::Highlight::Kate POD bug (https://rt.cpan.org/Ticket/Display.html?id=76160)
+        - Fix broken breakpoints. Thanks to Nick Perez and Liz for the help!
+        - Fix off-by-one error (Thanks Liz!)
 
 0.05    2012/01/04
         - Ouch! Add the actual highlighter to the MANIFEST

@@ -6,6 +6,7 @@ use warnings;
 use DB::Color::Highlight;
 use IO::Handle;
 use File::Spec::Functions qw(catfile catdir);
+use Scalar::Util 'dualvar';
 
 =head1 NAME
 
@@ -96,15 +97,20 @@ sub import {
             no warnings 'uninitialized';
             my $code = join "" => @{"::_<$filename"};
             [
-                map { "$_\n" }
-                  split /\n/ => $HIGHLIGHTER->highlight_text($code)
+                  split /(?<=\n)/ => $HIGHLIGHTER->highlight_text($code)
             ];
         };
 
-        # lie to the debugger about what the lines of code are
         {
+            # lie to the debugger about what the lines of code are
             no strict 'refs';
-            @{"::_<$filename"} = @$lines;
+            my $line_num = 0;
+            foreach ( @{"::_<$filename"} ) {
+                next unless defined;   # thanks Liz! (why does this work?)
+                my $line = $lines->[$line_num++];
+                my $numeric_value = 0+$_;
+                $_ = dualvar $numeric_value, $line;
+            }
         }
         goto $old_db;
     };

@@ -41,5 +41,7 @@ my @old_lines = split /\n/ => $test_more_code;
 my @new_lines = split /\n/ => $highlighted;
 
 is @old_lines, @new_lines, '... and the number of lines of code should be the same';
+diag @old_lines[165..169];
+diag @new_lines[165..169];
 
 done_testing;
