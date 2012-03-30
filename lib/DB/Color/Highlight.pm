@@ -100,7 +100,34 @@ sub highlight_text {
 
 sub _get_highlighted_text {
     my ( $self, $code ) = @_;
+
+    my @code;
+    my $line_num = 0;
+    my $in_pod   = 0;
+    my %pod_lines;
+    my @pod_line_nums;
+    foreach (split /\n/ => $code) {
+        if ( /^=(?!cut\b)/ ) {
+            $in_pod = 1;
+        }
+        if ($in_pod) {
+            $pod_lines{$line_num} = $_;
+            push @pod_line_nums => $line_num;
+            push @code          => '';
+        }
+        else {
+            push @code => $_;
+        }
+        if ( /^=cut\b/ ) {
+            $in_pod = 0;
+        }
+        $line_num++;
+    }
+    $code = join "\n" => @code;
     my $highlighted = $self->_highlighter->highlightText($code);
+    @code = split /\n/ => $highlighted;
+    @code[@pod_line_nums] = @pod_lines{@pod_line_nums};
+    return join "\n" => map { BLUE . $_ . RESET } @code;
 }
 
 sub _get_path_and_file {

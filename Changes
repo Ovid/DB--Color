@@ -4,6 +4,7 @@ Revision history for DB-Color
         - Don't highlight if NO_DB_COLOR environment variable is set to a true value.
         - Add optional debugging to log file
         - Naive caching of output files
+        - Workaround Syntax::Highlight::Kate POD bug (https://rt.cpan.org/Ticket/Display.html?id=76160)
 
 0.05    2012/01/04
         - Ouch! Add the actual highlighter to the MANIFEST
