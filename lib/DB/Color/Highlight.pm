@@ -3,7 +3,7 @@ package DB::Color::Highlight;
 use strict;
 use warnings;
 use Term::ANSIColor ':constants';
-use Digest::MD5 'md5_base64';
+use Digest::MD5 'md5_hex';
 use File::Spec::Functions qw(catfile catdir);
 use File::Path 'make_path';
 
@@ -37,7 +37,9 @@ sub _initialize {
     my ( $self, $args ) = @_;
 
     my $cache_dir = $args->{cache_dir};
+    $self->{debug_fh}  = $args->{debug_fh};
     $self->{cache_dir} = $cache_dir;
+
     unless ( -d $cache_dir ) {
         mkdir $cache_dir or die "Cannot mkdir ($cache_dir): $!";
     }
@@ -65,9 +67,17 @@ sub _initialize {
 sub _highlighter { $_[0]->{highlighter} }
 sub _cache_dir   { $_[0]->{cache_dir} }
 
+sub _debug {
+    my ( $self, $message ) = @_;
+    return unless my $debug = $self->{debug_fh};
+    print $debug "$message\n";
+}
+
 sub highlight_text {
     my ( $self, $code ) = @_;
     my ( $path, $file ) = $self->_get_path_and_file($code);
+
+    $self->_debug("Cache path is '$path'. Cache file is '$file'");
 
     unless ( -d $path ) {
         make_path($path);
@@ -75,22 +85,29 @@ sub highlight_text {
     $file = catfile( $path, $file );
 
     if ( -e $file ) {
+        $self->_debug("Cache hit on '$file'");
         open my $fh, '<', $file or die "Cannot open '$file' for reading: $!";
         return do { local $/; <$fh> };
     }
     else {
-        my $highlighted = $self->_highlighter->highlightText($code);
+        $self->_debug("Cache miss on '$file'");
+        my $highlighted = $self->_get_highlighted_text($code);
         open my $fh, '>', $file or die "Cannot open '$file' for writing: $!";
         print $fh $highlighted;
         return $highlighted;
     }
 }
 
+sub _get_highlighted_text {
+    my ( $self, $code ) = @_;
+    my $highlighted = $self->_highlighter->highlightText($code);
+}
+
 sub _get_path_and_file {
     my ( $self, $code ) = @_;
-    my $md5_base64 = md5_base64($code);
-    my $dir        = substr $md5_base64, 0, 2, '';
-    my $file       = $md5_base64;
+    my $md5  = md5_hex($code);
+    my $dir  = substr $md5, 0, 2, '';
+    my $file = $md5;
     return catdir( $self->_cache_dir, $dir ), $file;
 }
 

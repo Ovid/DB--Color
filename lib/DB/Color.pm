@@ -60,18 +60,23 @@ a memory hog, as if the debugger wasn't bad enough already.
 my %COLORED;
 my $DB_BASE_DIR = catdir( $ENV{HOME}, '.perldbcolor' );
 my $DB_LOG = catfile( $DB_BASE_DIR, 'debug.log' );
-my $HIGHLIGHTER = DB::Color::Highlight->new( { cache_dir => $DB_BASE_DIR } );
+my $DEBUG;
+if ( $ENV{DB_COLOR_DEBUG} || 1 ) {
+    open $DEBUG, '>>', $DB_LOG
+        or die "Cannot open $DB_LOG for appending: $!";
+    $DEBUG->autoflush(1);
+}
+my $HIGHLIGHTER = DB::Color::Highlight->new(
+    {
+        cache_dir => $DB_BASE_DIR,
+        debug_fh  => $DEBUG,
+    }
+);
 
 sub import {
     return if $ENV{NO_DB_COLOR};
     my $old_db = \&DB::DB;
 
-    my $debug;
-    if ( $ENV{DB_COLOR_DEBUG} || 1 ) {
-        open $debug, '>>', $DB_LOG
-            or die "Cannot open $DB_LOG for appending: $!";
-        $debug->autoflush(1);
-    }
 
     my $new_DB = sub {
         my $lvl = 0;
@@ -79,8 +84,8 @@ sub import {
             return if $pkg eq "DB" or $pkg =~ /^DB::/;
         }
         my ( $package, $filename ) = caller;
-        if ($debug) {
-            print $debug "In package '$package', filename '$filename'\n";
+        if ($DEBUG) {
+            print $DEBUG "In package '$package', filename '$filename'\n";
         }
 
         # syntax highlight everything and cache it
