@@ -41,6 +41,11 @@ Then use your debugger like normal:
 If the NO_DB_COLOR environment variable is set to a true value, syntax
 highlighting will be disabled.
 
+=head1 WINDOWS
+
+No, sorry. It's a combination of bad Windows support for ANSI escape sequences
+and bad debugger design.
+
 =head1 PERFORMANCE
 
 Syntax highlighting the code is very, very slow. As a result, we cache the
@@ -83,6 +88,16 @@ my $HIGHLIGHTER = DB::Color::Highlight->new(
 
 sub import {
     return if $ENV{NO_DB_COLOR};
+    if ( 'MSWin32' eq $^O ) {
+        warn <<"END";
+DB::Color does not run under Windows because the Windows terminal is too
+broken to understand terminal color code.
+
+DB::Color does not use Win32::Console because the debugger is too broken to be
+properly extensible.
+END
+        return;
+    }
     my $old_db = \&DB::DB;
 
     my $new_DB = sub {
