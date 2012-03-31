@@ -44,21 +44,39 @@ sub _initialize {
         mkdir $cache_dir or die "Cannot mkdir ($cache_dir): $!";
     }
 
+=for notes
+
+      CLEAR           RESET             BOLD            DARK
+      FAINT           ITALIC            UNDERLINE       UNDERSCORE
+      BLINK           REVERSE           CONCEALED
+
+      BLACK           RED               GREEN           YELLOW
+      BLUE            MAGENTA           CYAN            WHITE
+      BRIGHT_BLACK    BRIGHT_RED        BRIGHT_GREEN    BRIGHT_YELLOW
+      BRIGHT_BLUE     BRIGHT_MAGENTA    BRIGHT_CYAN     BRIGHT_WHITE
+
+      ON_BLACK        ON_RED            ON_GREEN        ON_YELLOW
+      ON_BLUE         ON_MAGENTA        ON_CYAN         ON_WHITE
+      ON_BRIGHT_BLACK ON_BRIGHT_RED     ON_BRIGHT_GREEN ON_BRIGHT_YELLOW
+      ON_BRIGHT_BLUE  ON_BRIGHT_MAGENTA ON_BRIGHT_CYAN  ON_BRIGHT_WHITE
+
+=cut
+
     my $highlighter = Syntax::Highlight::Engine::Kate::Perl->new(
         format_table => {
-            'Keyword'      => [ GREEN,   RESET ],
-            'Comment'      => [ BLUE,    RESET ],
-            'Decimal'      => [ YELLOW,  RESET ],
-            'Float'        => [ YELLOW,  RESET ],
-            'Function'     => [ CYAN,    RESET ],
-            'Identifier'   => [ RED,     RESET ],
-            'Normal'       => [ MAGENTA, RESET ],
-            'Operator'     => [ CYAN,    RESET ],
-            'Preprocessor' => [ RED,     RESET ],
-            'String'       => [ RED,     RESET ],
-            'String Char'  => [ RED,     RESET ],
-            'Symbol'       => [ CYAN,    RESET ],
-            'DataType'     => [ YELLOW,  RESET ],    # variable names
+            'Keyword'      => [ YELLOW,      RESET ],
+            'Comment'      => [ BRIGHT_BLUE, RESET ],
+            'Decimal'      => [ YELLOW,      RESET ],
+            'Float'        => [ YELLOW,      RESET ],
+            'Function'     => [ CYAN,        RESET ],
+            'Identifier'   => [ RED,         RESET ],
+            'Normal'       => [ WHITE,       RESET ],
+            'Operator'     => [ CYAN,        RESET ],
+            'Preprocessor' => [ RED,         RESET ],
+            'String'       => [ MAGENTA,     RESET ],
+            'String Char'  => [ RED,         RESET ],
+            'Symbol'       => [ CYAN,        RESET ],
+            'DataType'     => [ CYAN,        RESET ],    # variable names
         }
     );
     $self->{highlighter} = $highlighter;
