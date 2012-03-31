@@ -106,8 +106,8 @@ sub _get_highlighted_text {
     my $in_pod   = 0;
     my %pod_lines;
     my @pod_line_nums;
-    foreach (split /\n/ => $code) {
-        if ( /^=(?!cut\b)/ ) {
+    foreach ( split /\n/ => $code ) {
+        if (/^=(?!cut\b)/) {
             $in_pod = 1;
         }
         if ($in_pod) {
@@ -118,7 +118,7 @@ sub _get_highlighted_text {
         else {
             push @code => $_;
         }
-        if ( /^=cut\b/ ) {
+        if (/^=cut\b/) {
             $in_pod = 0;
         }
         $line_num++;

@@ -62,9 +62,9 @@ my %COLORED;
 my $DB_BASE_DIR = catdir( $ENV{HOME}, '.perldbcolor' );
 my $DB_LOG = catfile( $DB_BASE_DIR, 'debug.log' );
 my $DEBUG;
-if ( $ENV{DB_COLOR_DEBUG} || 1 ) {
+if ( $ENV{DB_COLOR_DEBUG} ) {
     open $DEBUG, '>>', $DB_LOG
-        or die "Cannot open $DB_LOG for appending: $!";
+      or die "Cannot open $DB_LOG for appending: $!";
     $DEBUG->autoflush(1);
 }
 my $HIGHLIGHTER = DB::Color::Highlight->new(
@@ -77,7 +77,6 @@ my $HIGHLIGHTER = DB::Color::Highlight->new(
 sub import {
     return if $ENV{NO_DB_COLOR};
     my $old_db = \&DB::DB;
-
 
     my $new_DB = sub {
         my $lvl = 0;
@@ -92,23 +91,39 @@ sub import {
         # syntax highlight everything and cache it
         my $lines = $COLORED{$package}{$filename} ||= do {
             no strict 'refs';
-
-            # quick hack
             no warnings 'uninitialized';
-            my $code = join "" => @{"::_<$filename"};
             [
-                  split /(?<=\n)/ => $HIGHLIGHTER->highlight_text($code)
+                split /(?<=\n)/ =>
+                  $HIGHLIGHTER->highlight_text( join "" => @{"::_<$filename"} )
             ];
         };
 
         {
+
             # lie to the debugger about what the lines of code are
             no strict 'refs';
             my $line_num = 0;
             foreach ( @{"::_<$filename"} ) {
-                next unless defined;   # thanks Liz! (why does this work?)
-                my $line = $lines->[$line_num++];
-                my $numeric_value = 0+$_;
+
+                # uncomment these to blow your f'in mind
+                #if ( not defined ) {
+                #    use Devel::Peek;
+                #    warn "line number is $line_num";
+                #    Dump($_);
+                #}
+                # The debugger special cases the first value in ::_<$filename.
+                # It's "undef" but sometimes contains some data about the
+                # program. I don't know entirely what it is, but this solves
+                # the "off by one" bug.
+                next unless defined;    # thanks Liz! (why does this work?)
+                my $line = $lines->[ $line_num++ ];
+                next unless defined $line;    # happens when $_ = "\n"
+                my $numeric_value = 0 + $_;
+
+                # Internally, the debugger uses dualvars for each line of
+                # code. If it's numeric value is 0, then the line is not
+                # breakable. If we don't include this, no lines in the
+                # debugger are breakable.
                 $_ = dualvar $numeric_value, $line;
             }
         }
