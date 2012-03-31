@@ -86,6 +86,10 @@ sub highlight_text {
 
     if ( -e $file ) {
         $self->_debug("Cache hit on '$file'");
+
+        # update the atime, mtime to ensure that our naive cache recognizes
+        # this as a "recent" file
+        utime time, time, $file or die "Cannot 'utime atime, mtime $file: $!";
         open my $fh, '<', $file or die "Cannot open '$file' for reading: $!";
         return do { local $/; <$fh> };
     }

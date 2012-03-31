@@ -3,7 +3,7 @@ Revision history for DB-Color
 0.06
         - Don't highlight if NO_DB_COLOR environment variable is set to a true value.
         - Add optional debugging to log file
-        - Naive caching of output files
+        - Naive caching of output files. File deleted after thirty days.
         - Workaround Syntax::Highlight::Kate POD bug (https://rt.cpan.org/Ticket/Display.html?id=76160)
         - Fix broken breakpoints. Thanks to Nick Perez and Liz for the help!
         - Fix off-by-one error (Thanks Liz!)

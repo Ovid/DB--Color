@@ -7,6 +7,8 @@ use DB::Color::Highlight;
 use IO::Handle;
 use File::Spec::Functions qw(catfile catdir);
 use Scalar::Util 'dualvar';
+use File::Find;
+use File::Path 'remove_tree';
 
 =head1 NAME
 
@@ -47,8 +49,9 @@ of the file contents. If the file is changed, we get a new sum. This means
 that syntax highlighting is very slow at first, but every time you hit the
 same file, assuming its unchnanged, the cached version is served first.
 
-Note that the cache files are never removed. This has merely been a naive hack
-for a proof of concept. Patches welcome.
+Note that the cache files are removed after they become 30 days old without
+being used. This has merely been a naive hack for a proof of concept. Patches
+welcome.
 
 =head1 ALPHA
 
@@ -62,11 +65,15 @@ my %COLORED;
 my $DB_BASE_DIR = catdir( $ENV{HOME}, '.perldbcolor' );
 my $DB_LOG = catfile( $DB_BASE_DIR, 'debug.log' );
 my $DEBUG;
+
+# Not documenting this because I don't guarantee stability, but you can play
+# with it if you want.
 if ( $ENV{DB_COLOR_DEBUG} ) {
     open $DEBUG, '>>', $DB_LOG
       or die "Cannot open $DB_LOG for appending: $!";
     $DEBUG->autoflush(1);
 }
+
 my $HIGHLIGHTER = DB::Color::Highlight->new(
     {
         cache_dir => $DB_BASE_DIR,
@@ -138,6 +145,20 @@ sub import {
     return;
 }
 
+END {
+    find(
+        sub {
+
+            # delete empty files or files > 30 days old
+            if ( -f $_ && ( -z _ || -M _ > 30 ) ) {
+                unlink($_) or die "Could not unlink '$File::Find::name': $!";
+            }
+        },
+        $DB_BASE_DIR,
+    );
+    finddepth( sub { rmdir $_ if -d }, $DB_BASE_DIR );
+}
+
 1;
 
 =head1 AUTHOR
@@ -146,19 +167,17 @@ Curtis "Ovid" Poe, C<< <ovid at cpan.org> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-db-color at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DB-Color>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-
-
+Please report any bugs or feature requests to C<bug-db-color at rt.cpan.org>,
+or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DB-Color>.  I will be
+notified, and then you'll automatically be notified of progress on your bug as
+I make changes.
 
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
     perldoc DB::Color
-
 
 You can also look for information at:
 
@@ -182,9 +201,10 @@ L<http://search.cpan.org/dist/DB-Color/>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
 
+Thanks to Nick Perez, Liz, and the 2012 Perl Hackathon for helping to overcome
+some major hurdles with this module.
 
 =head1 LICENSE AND COPYRIGHT
 
