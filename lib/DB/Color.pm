@@ -8,7 +8,6 @@ use IO::Handle;
 use File::Spec::Functions qw(catfile catdir);
 use Scalar::Util 'dualvar';
 use File::Find;
-use File::Path 'remove_tree';
 
 =head1 NAME
 
@@ -176,6 +175,8 @@ END {
         },
         $DB_BASE_DIR,
     );
+    # we're not testing for failure as this is a cheap hack to delete empty
+    # directories
     finddepth( sub { rmdir $_ if -d }, $DB_BASE_DIR );
 }
 

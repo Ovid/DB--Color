@@ -21,6 +21,9 @@ Version 0.07
 
 our $VERSION = '0.07';
 
+# increase this number by one to force the cache to generate new md5 numbers
+my $FORMAT_NUMBER = 1;
+
 BEGIN {
     no warnings 'redefine';
     *Syntax::Highlight::Engine::Kate::Template::logwarning = sub { };
@@ -40,7 +43,7 @@ sub _initialize {
     $self->{debug_fh}  = $args->{debug_fh};
     $self->{cache_dir} = $cache_dir;
 
-    unless ( -d $cache_dir ) {
+    if ( defined $cache_dir and not -d $cache_dir ) {
         mkdir $cache_dir or die "Cannot mkdir ($cache_dir): $!";
     }
 
@@ -78,8 +81,9 @@ sub _initialize {
     $self->{highlighter} = $highlighter;
 }
 
-sub _highlighter { $_[0]->{highlighter} }
-sub _cache_dir   { $_[0]->{cache_dir} }
+sub _highlighter  { $_[0]->{highlighter} }
+sub _cache_dir    { $_[0]->{cache_dir} }
+sub _should_cache { defined $_[0]->_cache_dir }
 
 sub _debug {
     my ( $self, $message ) = @_;
@@ -89,30 +93,33 @@ sub _debug {
 
 sub highlight_text {
     my ( $self, $code ) = @_;
-    my ( $path, $file ) = $self->_get_path_and_file($code);
 
-    $self->_debug("Cache path is '$path'. Cache file is '$file'");
+    if ( $self->_should_cache ) {
+        my ( $path, $file ) = $self->_get_path_and_file($code);
+        unless ( -d $path ) {
+            make_path($path);
+        }
+        $file = catfile( $path, $file );
 
-    unless ( -d $path ) {
-        make_path($path);
-    }
-    $file = catfile( $path, $file );
+        if ( -e $file ) {
+            $self->_debug("Cache hit on '$file'");
 
-    if ( -e $file ) {
-        $self->_debug("Cache hit on '$file'");
-
-        # update the atime, mtime to ensure that our naive cache recognizes
-        # this as a "recent" file
-        utime time, time, $file or die "Cannot 'utime atime, mtime $file: $!";
-        open my $fh, '<', $file or die "Cannot open '$file' for reading: $!";
-        return do { local $/; <$fh> };
+            # update the atime, mtime to ensure that our naive cache recognizes
+            # this as a "recent" file
+            utime time, time, $file or die "Cannot 'utime atime, mtime $file: $!";
+            open my $fh, '<', $file or die "Cannot open '$file' for reading: $!";
+            return do { local $/; <$fh> };
+        }
+        else {
+            $self->_debug("Cache miss on '$file'");
+            my $highlighted = $self->_get_highlighted_text($code);
+            open my $fh, '>', $file or die "Cannot open '$file' for writing: $!";
+            print $fh $highlighted;
+            return $highlighted;
+        }
     }
     else {
-        $self->_debug("Cache miss on '$file'");
-        my $highlighted = $self->_get_highlighted_text($code);
-        open my $fh, '>', $file or die "Cannot open '$file' for writing: $!";
-        print $fh $highlighted;
-        return $highlighted;
+        return $self->_get_highlighted_text($code);
     }
 }
 
@@ -150,10 +157,26 @@ sub _get_highlighted_text {
 
 sub _get_path_and_file {
     my ( $self, $code ) = @_;
-    my $md5  = md5_hex($code);
-    my $dir  = substr $md5, 0, 2, '';
+    unless ( $self->_should_cache ) {
+        $self->_debug("Caching disabled");
+        return;
+    }
+    my $md5 = md5_hex( $self->_get_unique_factors, $code );
+    my $dir = substr $md5, 0, 2, '';
     my $file = $md5;
-    return catdir( $self->_cache_dir, $dir ), $file;
+
+    my $path = catdir( $self->_cache_dir, $dir );
+    $self->_debug("Cache path is '$path'. Cache file is '$file'");
+    return $path, $file;
+}
+
+sub _format_number {
+    return $FORMAT_NUMBER;
+}
+
+sub _get_unique_factors {
+    my $self = shift;
+    return ( $self->_format_number, ref $self );
 }
 
 1;
