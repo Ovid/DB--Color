@@ -70,8 +70,8 @@ debugged files will load very quickly (assuming they haven't changed).
 
 =head1 CONFIGURATION
 
-You can configure C<DB::Color> by creating a F<$HOME/.perldbcolorrc>
-configuration file. It looks like this:
+You can optionally configure C<DB::Color> by creating a
+F<$HOME/.perldbcolorrc> configuration file. It looks like this:
 
  [core]
  
@@ -84,7 +84,8 @@ configuration file. It looks like this:
  # where to put the cache dir
  cache_dir   = /users/ovid/.perldbcolor
  
-The above values are more or less the defaults for this module.
+The above values are more or less the defaults for this module. They are all
+optional.
 
 =head1 ALPHA
 
