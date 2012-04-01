@@ -4,7 +4,7 @@ DB::Color - Colorize your debugger output
 
 # VERSION
 
-Version 0.07
+Version 0.08
 
 # SYNOPSIS
 
@@ -38,6 +38,9 @@ breakpoint in a new file, the debugger may appear to hang for a moment
 highlighted and cached. The next time the debugger enters this file, the
 highlighting should be instantaneous.
 
+You can speed up the debugger by using the [perldbsyntax](http://search.cpan.org/perldoc?perldbsyntax) program which is
+included in this distribution. It will pregenerate syntax files for you.
+
 Syntax highlighting the code is very slow. As a result, we cache the output
 files in `$HOME/.perldbcolor`. This is done by calculating the md5 sum of the
 file contents. If the file is changed, we get a new sum. This means that
@@ -45,8 +48,8 @@ syntax highlighting is very slow at first, but every time you hit the same
 file, assuming its unchanged, the cached version is served first.
 
 Note that the cache files are removed after they become 30 (but see config)
-days old without being used. This has merely been a naive hack for a proof of
-concept. Patches welcome.
+days old without being used. If you use the debugger regularly, commonly
+debugged files will load very quickly (assuming they haven't changed).
 
 # CONFIGURATION
 
