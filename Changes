@@ -1,5 +1,8 @@
 Revision history for DB-Color
 
+0.08
+        - Added a perldbsyntax script to pre-generate syntax files.
+
 0.07   2012/04/01
         - Add a config file to let people control some behavior.
         - The afterinit() sub is no longer required in the .perldb file (it's

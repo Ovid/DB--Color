@@ -1,0 +1,127 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use DB::Color;
+use File::Spec::Functions 'catfile';
+use File::Basename;
+
+sub uniq (@) {
+    my %seen = ();
+    grep { not $seen{$_}++ } @_;
+}
+
+my $program = basename($0);
+my $module = shift || die "Ussage $program MODULENAME";
+
+my $config =
+  DB::Color::Config->read( catfile( $ENV{HOME}, DB::Color::default_rcfile() ) );
+my $DB_BASE_DIR = $config->{core}{cache_dir} || DB::Color::default_base_dir();
+
+eval "package __ANON__; use $module";
+die $@ if $@;
+
+my @files = sort uniq map { $INC{$_} } grep { !/^DB\// } keys %INC;
+
+my $HIGHLIGHTER_CLASS = $config->{core}{highlighter} || 'DB::Color::Highlight';
+eval "use $HIGHLIGHTER_CLASS";
+die $@ if $@;
+
+my $HIGHLIGHTER = $HIGHLIGHTER_CLASS->new( { cache_dir => $DB_BASE_DIR } );
+
+my $total   = @files;
+my $current = 1;
+foreach my $file (@files) {
+    print "Highlighting $current out of $total: $file\n";
+    $current++;
+    if ( open my $fh, '<', $file ) {
+        my $code = do { local $/; <$fh> };
+        $HIGHLIGHTER->highlight_text($code);    # this will cache it
+    }
+    else {
+        warn "Skipping $file. Could not open for reading: $!";
+    }
+}
+
+__END__
+
+=head1 NAME
+
+perldbsyntax - Pregenerate syntax highlighting
+
+=head2 SYNOSPSI
+
+ perldbsyntax DANCER
+
+=head2 DESCRIPTION
+
+Run this program, pass it a classname. It will attempt to C<use> that class
+and, if successful, will pre-generate the syntax files for everything in
+C<%INC>. This helps to avoid the slowdown when debugging code with DB::Color.
+
+Your C<.perldbcolorrc> file will be respected.
+
+=head2 SEE ALSO
+
+L<DB::Color>
+
+=head1 AUTHOR
+
+Curtis "Ovid" Poe, C<< <ovid at cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-db-color at rt.cpan.org>,
+or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DB-Color>.  I will be
+notified, and then you'll automatically be notified of progress on your bug as
+I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc DB::Color
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=DB-Color>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/DB-Color>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/DB-Color>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/DB-Color/>
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to Nick Perez, Liz, and the 2012 Perl Hackathon for helping to overcome
+some major hurdles with this module.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2011 Curtis "Ovid" Poe.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+
+=cut
+
+1;    # End of DB::Color

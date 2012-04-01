@@ -17,11 +17,11 @@ DB::Color - Colorize your debugger output
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 SYNOPSIS
 
@@ -55,6 +55,9 @@ breakpoint in a new file, the debugger may appear to hang for a moment
 highlighted and cached. The next time the debugger enters this file, the
 highlighting should be instantaneous.
 
+You can speed up the debugger by using the L<perldbsyntax> program which is
+included in this distribution. It will pregenerate syntax files for you.
+
 Syntax highlighting the code is very slow. As a result, we cache the output
 files in F<$HOME/.perldbcolor>. This is done by calculating the md5 sum of the
 file contents. If the file is changed, we get a new sum. This means that
@@ -62,8 +65,8 @@ syntax highlighting is very slow at first, but every time you hit the same
 file, assuming its unchanged, the cached version is served first.
 
 Note that the cache files are removed after they become 30 (but see config)
-days old without being used. This has merely been a naive hack for a proof of
-concept. Patches welcome.
+days old without being used. If you use the debugger regularly, commonly
+debugged files will load very quickly (assuming they haven't changed).
 
 =head1 CONFIGURATION
 
@@ -91,11 +94,11 @@ a memory hog, as if the debugger wasn't bad enough already.
 
 =cut
 
-my $config = DB::Color::Config->read( catfile( $ENV{HOME}, '.perldbcolorrc' ) );
+my $config = DB::Color::Config->read( default_rcfile() );
 
 my %COLORED;
-my $DB_BASE_DIR = $config->{core}{cache_dir}
-  || catdir( $ENV{HOME}, '.perldbcolor' );
+my $DB_BASE_DIR = $config->{core}{cache_dir} || default_base_dir();
+
 my $DB_LOG = catfile( $DB_BASE_DIR, 'debug.log' );
 my $CACHE_MAX_AGE = $config->{core}{cache_max_age} || 30;
 my $DEBUG;
@@ -108,7 +111,11 @@ if ( $ENV{DB_COLOR_DEBUG} ) {
     $DEBUG->autoflush(1);
 }
 
-my $HIGHLIGHTER = DB::Color::Highlight->new(
+my $HIGHLIGHTER_CLASS = $config->{core}{highlighter} || 'DB::Color::Highlight';
+eval "use $HIGHLIGHTER_CLASS";
+die $@ if $@;
+
+my $HIGHLIGHTER = $HIGHLIGHTER_CLASS->new(
     {
         cache_dir => $DB_BASE_DIR,
         debug_fh  => $DEBUG,
@@ -120,6 +127,9 @@ sub DB::afterinit {
     push @DB::typeahead => "{{v"
       unless $DB::already_curly_curly_v++;
 }
+
+sub default_rcfile { catfile( $ENV{HOME}, '.perldbcolorrc' ) }
+sub default_base_dir { catfile( $ENV{HOME}, '.perldbcolor' ) }
 
 sub import {
     return if $ENV{NO_DB_COLOR};

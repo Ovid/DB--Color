@@ -5,7 +5,7 @@ package DB::Color::Config;
 use strict;
 BEGIN {
     require 5.004;
-    $DB::Color::Config::VERSION = '0.07';
+    $DB::Color::Config::VERSION = '0.08';
     $DB::Color::Config::errstr  = '';
 }
 

@@ -15,6 +15,7 @@ my $builder = Module::Build->new(
     add_to_cleanup       => ['DB-Color-*'],
     create_makefile_pl   => 'traditional',
     recursive_test_files => 1,
+    script_files         => 'script',
     meta_merge =>
       { resources => { repository => 'https://github.com/Ovid/DB--Color' } },
 );
