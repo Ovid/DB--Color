@@ -4,6 +4,8 @@ use 5.008;
 use strict;
 use warnings;
 use DB::Color::Highlight;
+use DB::Color::Config;
+
 use IO::Handle;
 use File::Spec::Functions qw(catfile catdir);
 use Scalar::Util 'dualvar';
@@ -47,15 +49,39 @@ and bad debugger design.
 
 =head1 PERFORMANCE
 
-Syntax highlighting the code is very, very slow. As a result, we cache the
-output files in F<$HOME/.perldbcolor>. This is done by calculating the md5 sum
-of the file contents. If the file is changed, we get a new sum. This means
-that syntax highlighting is very slow at first, but every time you hit the
-same file, assuming its unchnanged, the cached version is served first.
+When using the debugger and when you step into something, or continue to a
+breakpoint in a new file, the debugger may appear to hang for a moment
+(perhaps a long moment if the file is big) while the file is syntax
+highlighted and cached. The next time the debugger enters this file, the
+highlighting should be instantaneous.
 
-Note that the cache files are removed after they become 30 days old without
-being used. This has merely been a naive hack for a proof of concept. Patches
-welcome.
+Syntax highlighting the code is very slow. As a result, we cache the output
+files in F<$HOME/.perldbcolor>. This is done by calculating the md5 sum of the
+file contents. If the file is changed, we get a new sum. This means that
+syntax highlighting is very slow at first, but every time you hit the same
+file, assuming its unchanged, the cached version is served first.
+
+Note that the cache files are removed after they become 30 (but see config)
+days old without being used. This has merely been a naive hack for a proof of
+concept. Patches welcome.
+
+=head1 CONFIGURATION
+
+You can configure C<DB::Color> by creating a F<$HOME/.perldbcolorrc>
+configuration file. It looks like this:
+
+ [core]
+ 
+ # the class that will highlight the code
+ highlighter = DB::Color::Highlight
+ 
+ # Any cache file not accessed after this number of days is purged
+ cache_max_age = 30
+ 
+ # where to put the cache dir
+ cache_dir   = /users/ovid/.perldbcolor
+ 
+The above values are more or less the defaults for this module.
 
 =head1 ALPHA
 
@@ -65,9 +91,13 @@ a memory hog, as if the debugger wasn't bad enough already.
 
 =cut
 
+my $config = DB::Color::Config->read( catfile( $ENV{HOME}, '.perldbcolorrc' ) );
+
 my %COLORED;
-my $DB_BASE_DIR = catdir( $ENV{HOME}, '.perldbcolor' );
+my $DB_BASE_DIR = $config->{core}{cache_dir}
+  || catdir( $ENV{HOME}, '.perldbcolor' );
 my $DB_LOG = catfile( $DB_BASE_DIR, 'debug.log' );
+my $CACHE_MAX_AGE = $config->{core}{cache_max_age} || 30;
 my $DEBUG;
 
 # Not documenting this because I don't guarantee stability, but you can play
@@ -86,8 +116,9 @@ my $HIGHLIGHTER = DB::Color::Highlight->new(
 );
 
 sub DB::afterinit {
-     push @DB::typeahead => "{{v"
-       unless $DB::already_curly_curly_v++;
+    no warnings 'once';
+    push @DB::typeahead => "{{v"
+      unless $DB::already_curly_curly_v++;
 }
 
 sub import {
@@ -168,8 +199,8 @@ END {
     find(
         sub {
 
-            # delete empty files or files > 30 days old
-            if ( -f $_ && ( -z _ || -M _ > 30 ) ) {
+            # delete empty files or files > $CACHE_MAX_AGE days old
+            if ( -f $_ && ( -z _ || -M _ > $CACHE_MAX_AGE ) ) {
                 unlink($_) or die "Could not unlink '$File::Find::name': $!";
             }
         },

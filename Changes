@@ -1,6 +1,7 @@
 Revision history for DB-Color
 
-0.07
+0.07   2012/04/01
+        - Add a config file to let people control some behavior.
         - The afterinit() sub is no longer required in the .perldb file (it's
           done internally).
         - The md5 sum is now generate with the "format number" and classname.
