@@ -4,7 +4,7 @@
       "Curtis 'Ovid' Poe <ovid@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112621",
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.120630",
    "license" : [
       "perl_5"
    ],
@@ -16,16 +16,17 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : 0
+            "Test::More" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "Module::Build" : "0.4"
          }
       },
       "runtime" : {
          "requires" : {
+            "Digest::MD5" : "0",
             "Syntax::Highlight::Engine::Kate" : "0.06"
          }
       }
@@ -33,11 +34,15 @@
    "provides" : {
       "DB::Color" : {
          "file" : "lib/DB/Color.pm",
-         "version" : "0.05"
+         "version" : "0.07"
+      },
+      "DB::Color::Config" : {
+         "file" : "lib/DB/Color/Config.pm",
+         "version" : "0.07"
       },
       "DB::Color::Highlight" : {
          "file" : "lib/DB/Color/Highlight.pm",
-         "version" : "0.05"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -49,5 +54,5 @@
          "url" : "https://github.com/Ovid/DB--Color"
       }
    },
-   "version" : "0.05"
+   "version" : "0.07"
 }
