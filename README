@@ -7,15 +7,17 @@ http://blogs.perl.org/users/ovid/2010/11/syntax-highlighting-for-the-perl-debugg
 
 Then add this to your $HOME/.perldb
 
- sub afterinit {
-     push @DB::typeahead, "{{v"
-       unless $DB::already_curly_curly_v++;
- }
  use DB::Color;
 
 Then use your debugger like normal:
 
  perl -d some_file.pl
+
+If you don't want a $HOME/.perldb file:
+
+ perl -MDB::Color -d some_file.pl
+
+See perldoc DB::Color for more information.
 
 This code is a proof of concept and is buggy. The syntax highlighting is
 buggy. Fix it :)

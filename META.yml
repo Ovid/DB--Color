@@ -5,9 +5,9 @@ author:
 build_requires:
   Test::More: 0
 configure_requires:
-  Module::Build: 0.4
+  Module::Build: 0.38
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4, CPAN::Meta::Converter version 2.120630'
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112621'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,14 +16,13 @@ name: DB-Color
 provides:
   DB::Color:
     file: lib/DB/Color.pm
-    version: 0.06
+    version: 0.05
   DB::Color::Highlight:
     file: lib/DB/Color/Highlight.pm
-    version: 0.06
+    version: 0.05
 requires:
-  Digest::MD5: 0
   Syntax::Highlight::Engine::Kate: 0.06
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Ovid/DB--Color
-version: 0.06
+version: 0.05
