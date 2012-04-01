@@ -16,25 +16,25 @@ DB::Color - Colorize your debugger output
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 SYNOPSIS
 
-Put the following in your $HOME/.perldb file:
+Put the following in your F<$HOME/.perldb> file:
 
- sub afterinit {
-     push @DB::typeahead, "{{v"
-       unless $DB::already_curly_curly_v++;
- }
  use DB::Color;
 
 Then use your debugger like normal:
 
  perl -d some_file.pl
+
+If you don't want a F<$HOME/.perldb> file, you can do this:
+
+ perl -MDB::Color -e some_file.pl
 
 =head1 DISABLING COLOR
 
@@ -85,6 +85,11 @@ my $HIGHLIGHTER = DB::Color::Highlight->new(
         debug_fh  => $DEBUG,
     }
 );
+
+sub DB::afterinit {
+     push @DB::typeahead => "{{v"
+       unless $DB::already_curly_curly_v++;
+}
 
 sub import {
     return if $ENV{NO_DB_COLOR};

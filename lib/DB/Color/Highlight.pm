@@ -15,11 +15,11 @@ DB::Color::Highlight - Provides highlighting for DB::Color
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 BEGIN {
     no warnings 'redefine';
@@ -44,23 +44,19 @@ sub _initialize {
         mkdir $cache_dir or die "Cannot mkdir ($cache_dir): $!";
     }
 
-=for notes
-
-      CLEAR           RESET             BOLD            DARK
-      FAINT           ITALIC            UNDERLINE       UNDERSCORE
-      BLINK           REVERSE           CONCEALED
-
-      BLACK           RED               GREEN           YELLOW
-      BLUE            MAGENTA           CYAN            WHITE
-      BRIGHT_BLACK    BRIGHT_RED        BRIGHT_GREEN    BRIGHT_YELLOW
-      BRIGHT_BLUE     BRIGHT_MAGENTA    BRIGHT_CYAN     BRIGHT_WHITE
-
-      ON_BLACK        ON_RED            ON_GREEN        ON_YELLOW
-      ON_BLUE         ON_MAGENTA        ON_CYAN         ON_WHITE
-      ON_BRIGHT_BLACK ON_BRIGHT_RED     ON_BRIGHT_GREEN ON_BRIGHT_YELLOW
-      ON_BRIGHT_BLUE  ON_BRIGHT_MAGENTA ON_BRIGHT_CYAN  ON_BRIGHT_WHITE
-
-=cut
+#      CLEAR           RESET             BOLD            DARK
+#      FAINT           ITALIC            UNDERLINE       UNDERSCORE
+#      BLINK           REVERSE           CONCEALED
+#
+#      BLACK           RED               GREEN           YELLOW
+#      BLUE            MAGENTA           CYAN            WHITE
+#      BRIGHT_BLACK    BRIGHT_RED        BRIGHT_GREEN    BRIGHT_YELLOW
+#      BRIGHT_BLUE     BRIGHT_MAGENTA    BRIGHT_CYAN     BRIGHT_WHITE
+#
+#      ON_BLACK        ON_RED            ON_GREEN        ON_YELLOW
+#      ON_BLUE         ON_MAGENTA        ON_CYAN         ON_WHITE
+#      ON_BRIGHT_BLACK ON_BRIGHT_RED     ON_BRIGHT_GREEN ON_BRIGHT_YELLOW
+#      ON_BRIGHT_BLUE  ON_BRIGHT_MAGENTA ON_BRIGHT_CYAN  ON_BRIGHT_WHITE
 
     my $highlighter = Syntax::Highlight::Engine::Kate::Perl->new(
         format_table => {

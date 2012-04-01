@@ -1,5 +1,9 @@
 Revision history for DB-Color
 
+0.07
+        - The afterinit() sub is no longer required in the .perldb file (it's
+          done internally).
+
 0.06    2012/03/31
         - Don't highlight if NO_DB_COLOR environment variable is set to a true value.
         - Add optional debugging to log file (internal and undocumented. Use
