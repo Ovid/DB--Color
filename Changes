@@ -1,6 +1,8 @@
 Revision history for DB-Color
 
-0.08
+0.08   2012/04/08
+        - Fixed bug where two or more package declarations in a single file
+          would break syntax highlighting.
         - Added a perldbsyntax script to pre-generate syntax files.
 
 0.07   2012/04/01
