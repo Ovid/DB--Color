@@ -34,15 +34,15 @@
    "provides" : {
       "DB::Color" : {
          "file" : "lib/DB/Color.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "DB::Color::Config" : {
          "file" : "lib/DB/Color/Config.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "DB::Color::Highlight" : {
          "file" : "lib/DB/Color/Highlight.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -54,5 +54,5 @@
          "url" : "https://github.com/Ovid/DB--Color"
       }
    },
-   "version" : "0.07"
+   "version" : "0.08"
 }

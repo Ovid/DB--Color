@@ -8,7 +8,9 @@ WriteMakefile
   'PL_FILES' => {},
   'INSTALLDIRS' => 'site',
   'NAME' => 'DB::Color',
-  'EXE_FILES' => [],
+  'EXE_FILES' => [
+                   'script/perldbsyntax'
+                 ],
   'VERSION_FROM' => 'lib/DB/Color.pm',
   'PREREQ_PM' => {
                    'Test::More' => 0,
