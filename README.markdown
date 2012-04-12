@@ -18,7 +18,7 @@ Then use your debugger like normal:
 
 If you don't want a `$HOME/.perldb` file, you can do this:
 
-    perl -MDB::Color -e some_file.pl
+    perl -MDB::Color -d some_file.pl
 
 # DISABLING COLOR
 
