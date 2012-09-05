@@ -1,5 +1,9 @@
 Revision history for DB-Color
 
+0.09   2012/09/05
+        - Don't use BRIGHT_BLUE if they have Term::ANSIColor < 3 (Cosimo
+          Streppone)
+
 0.08   2012/04/08
         - Fixed bug where two or more package declarations in a single file
           would break syntax highlighting.

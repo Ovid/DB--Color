@@ -11,6 +11,7 @@ my $builder = Module::Build->new(
     requires          => {
         'Syntax::Highlight::Engine::Kate' => 0.06,
         'Digest::MD5'                     => 0,
+        'Term::ANSIColor' => 0,    # 3.0 or better to get bright colors
     },
     add_to_cleanup       => ['DB-Color-*'],
     create_makefile_pl   => 'traditional',

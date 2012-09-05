@@ -7,6 +7,13 @@ use Digest::MD5 'md5_hex';
 use File::Spec::Functions qw(catfile catdir);
 use File::Path 'make_path';
 
+BEGIN {
+    if ( !( Term::ANSIColor->VERSION >= 3 ) ) {
+        no warnings 'redefine';
+        *BRIGHT_BLUE = sub { BLUE };
+    }
+}
+
 use Syntax::Highlight::Engine::Kate::Perl;
 
 =head1 NAME
@@ -15,11 +22,11 @@ DB::Color::Highlight - Provides highlighting for DB::Color
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 # increase this number by one to force the cache to generate new md5 numbers
 my $FORMAT_NUMBER = 1;
