@@ -157,7 +157,7 @@ END
         }
 
         # syntax highlight everything and cache it
-        my $lines = $COLORED{$package}{$filename} ||= do {
+        my $lines = $COLORED{$filename} ||= do {
             no strict 'refs';
             no warnings 'uninitialized';
             [
