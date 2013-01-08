@@ -1,5 +1,10 @@
 Revision history for DB-Color
 
+0.10   2012/01/08
+        - Fix "Argument isn't numeric" warnings.
+        - Assert minimum version of File::Path to fix "make_path is not
+          exported" build failures.
+
 0.09   2012/09/05
         - Don't use BRIGHT_BLUE if they have Term::ANSIColor < 3 (Cosimo
           Streppone)
