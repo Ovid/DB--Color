@@ -186,6 +186,10 @@ END
                 next unless defined;    # thanks Liz! (why does this work?)
                 my $line = $lines->[ $line_num++ ];
                 next unless defined $line;    # happens when $_ = "\n"
+
+                # XXX Cheap hack to fix
+                # Argument "{\n" isn't numeric in addition (+) at DB/Color.pm line 189.
+                no warnings 'numeric'; 
                 my $numeric_value = 0 + $_;
 
                 # Internally, the debugger uses dualvars for each line of
