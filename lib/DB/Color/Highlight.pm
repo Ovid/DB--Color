@@ -22,11 +22,11 @@ DB::Color::Highlight - Provides highlighting for DB::Color
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 # increase this number by one to force the cache to generate new md5 numbers
 my $FORMAT_NUMBER = 1;
