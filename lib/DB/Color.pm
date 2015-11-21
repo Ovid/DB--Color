@@ -17,11 +17,11 @@ DB::Color - Colorize your debugger output
 
 =head1 VERSION
 
-Version 0.10
+Version 0.20
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '0.20';
 
 =head1 SYNOPSIS
 
@@ -67,6 +67,33 @@ file, assuming its unchanged, the cached version is served first.
 Note that the cache files are removed after they become 30 (but see config)
 days old without being used. If you use the debugger regularly, commonly
 debugged files will load very quickly (assuming they haven't changed).
+
+=head1 CONDITIONAL LOADING
+
+If you prefer, you may only want to have I<some> of your projects "colorized".
+If so, you can do something like this:
+
+    use DB::Color sentinel => '.colorize';
+
+If an if the C<.colorize> sentinel (or whatever you named it) does not exist,
+C<DB::Color> will not be used.
+
+=head1 WORKFLOW
+
+To use C<DB::Color> effectively, I recommend the following:
+
+    $ cpanm DB::Color
+    $ echo "use DB::Color sentinel => '.colorize'" >> ~/.perldb
+    # cd to project you want to colorize and create the sentinel
+    $ touch .colorize
+    # colorize the project. This will likely take a long time
+    $ PERL5LIB=lib:t/tests perldbsyntax
+
+At that point, you're almost good to go. However, as you're rapidly changing
+files, the debugger will still probably be very slow. Instead, create a
+watcher to watch your project directories and rehighlight any files which have
+been created or modified. An example of a watcher program is the
+F<examples/colorize> program included with this distribution.
 
 =head1 CONFIGURATION
 
@@ -133,6 +160,13 @@ sub default_rcfile { catfile( $ENV{HOME}, '.perldbcolorrc' ) }
 sub default_base_dir { catfile( $ENV{HOME}, '.perldbcolor' ) }
 
 sub import {
+    my ( $package, %arg_for ) = @_;
+    my $sentinel = $arg_for{sentinel};
+
+    if ( defined $sentinel && !-e $sentinel ) {
+        warn "DB::Color not running because '$sentinel' was requested, but not found\n";
+        return;
+    }
     return if $ENV{NO_DB_COLOR};
     if ( 'MSWin32' eq $^O ) {
         warn <<"END";
@@ -234,11 +268,9 @@ Curtis "Ovid" Poe, C<< <ovid at cpan.org> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-db-color at rt.cpan.org>,
-or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DB-Color>.  I will be
-notified, and then you'll automatically be notified of progress on your bug as
-I make changes.
+Please report any bugs or feature requests through the web interface at
+L<https://github.com/Ovid/DB--Color/issues>.  I will be notified, and then
+you'll automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
 
@@ -250,9 +282,9 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker (report bugs here)
+=item * Bug tracker (report bugs here)
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=DB-Color>
+L<https://github.com/Ovid/DB--Color/issues>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
@@ -265,6 +297,10 @@ L<http://cpanratings.perl.org/d/DB-Color>
 =item * Search CPAN
 
 L<http://search.cpan.org/dist/DB-Color/>
+
+=item * Github
+
+L<http://github.com/Ovid/DB--Color>
 
 =back
 
