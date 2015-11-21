@@ -1,5 +1,14 @@
 Revision history for DB-Color
 
+0.20   2015/11/21
+        - Add optional sentinel support to avoid loading DB::Color unless
+          requested.
+        - Add an example in examples/colorize of a program which can
+          continuously colorize your files on the fly.
+        - Add a "WORKFLOW" section to the docs to explain more efficient usage
+          of this module.
+        - Remove Module::Build. RIP :/
+
 0.10   2012/01/08
         - Fix "Argument isn't numeric" warnings.
         - Assert minimum version of File::Path to fix "make_path is not
