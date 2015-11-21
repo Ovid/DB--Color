@@ -1,0 +1,169 @@
+#!/usr/bin/env perl
+
+# vim: filetype=perl
+
+use 5.18.0;
+use lib qw{lib t/lib t/tests};
+use warnings;
+use autodie ':all';
+use Capture::Tiny 'capture';
+use Perl6::Junction 'any';
+use DB::Color;
+use DB::Color::Highlight;
+use Time::HiRes qw/gettimeofday tv_interval/;
+use IO::Interactive qw/is_interactive/;
+use File::ChangeNotify;
+use File::Spec::Functions qw/catfile/;
+use Try::Tiny;
+
+# There's probably a better way to do this, but kqueue isn't very effective on
+# OS X
+package Do::Not::Load::KQueue {
+    use Moose;
+    extends 'File::ChangeNotify::Watcher::Default';
+}
+
+MAIN(@ARGV);
+
+sub MAIN {
+    my @dirs = @_;
+
+    my $watcher = Do::Not::Load::KQueue->new(
+        directories => \@dirs,
+        filter      => qr/\.(?:pm|pl|t)$/,
+    );
+
+    my $highlighter = DB::Color::Highlight->new({
+        cache_dir => DB::Color::default_base_dir()
+    });
+
+    my $allowed_event_types = any(qw/modify create/);
+
+    while ( my @events = $watcher->wait_for_events() ) {
+        EVENT: foreach my $event (@events) {
+            next EVENT unless $event->type eq $allowed_event_types;
+            highlight_code( $event, \@dirs, $highlighter );
+        }
+    }
+}
+
+sub highlight_code {
+    my ( $event, $dirs, $highlighter ) = @_;
+
+    my $path = $event->path;
+    foreach my $dir (@$dirs) {
+        if ( $path =~ m{^\Q$dir\E/?(?<package>.*)} ) {
+            my $package = $+{package};
+
+            unless ( $package =~ /\.t$/ ) {
+                # don't convert test files to package names
+                $package =~ s/\.\w+$//;
+                $package =~ s{/}{::}g;
+            }
+
+            # I was probably hacking on a file and accidentally saved
+            # something which did not compile
+            my $success;
+            try {
+                # ignore any output. Just check for success.
+                capture { system($^X, '-c', $path) };
+                $success = 1;
+            }
+            catch {
+                my $error = $@;
+                say "Could not compile '$package': $error" if is_interactive;
+            };
+            return unless $success;
+
+            open my $fh, '<', $path;
+            my $code = do { local $/; <$fh> };
+            my $start = [gettimeofday];
+            $highlighter->highlight_text($code);    # this will cache it
+            my $elapsed = tv_interval( $start, [gettimeofday] );
+            say "$elapsed seconds to colorize $package" if is_interactive;
+        }
+    }
+}
+
+__END__
+
+=head1 NAME
+
+colorize - watch for file changes and colorize them
+
+=head1 SYNOPSIS
+
+    colorize /absolute/path/lib /absolute/path/t/tests
+
+=head1 DESCRIPTION
+
+This program takes a list of directories and watches for changes to any files
+ending in C<.pm>, C<.pl>, or C<.t>. For any of those files, if the change
+types (per C<File::ChangeNotify> is C<create> or C<modify>, it will attempt to
+syntax highlight that file. Thus, while using the debugger, rather than syntax
+highlighting the code when you enter the debugger (and having a huge wait),
+this code attempts to syntax highlight your code C<before> you enter the
+debugger.
+
+=head1 EXAMPLE ONLY
+
+This code is only an example. You'll likely need to customize it for your
+situation.
+
+=head1 AUTHOR
+
+Curtis "Ovid" Poe, C<< <ovid at cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests through the web interface at
+L<https://github.com/Ovid/DB--Color/issues>.  I will be notified, and then
+you'll automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc DB::Color
+
+You can also look for information at:
+
+=over 4
+
+=item * Bug tracker (report bugs here)
+
+L<https://github.com/Ovid/DB--Color/issues>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<https://github.com/Ovid/DB--Color/>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/DB-Color>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/DB-Color/>
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to Nick Perez, Liz, and the 2012 Perl Hackathon for helping to overcome
+some major hurdles with this module.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2011 Curtis "Ovid" Poe.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+
+=cut
+
+1;    # End of DB::Color
